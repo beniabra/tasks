@@ -1,6 +1,6 @@
 import { Answer } from "./interfaces/answer";
 import { Question, QuestionType } from "./interfaces/question";
-import { makeBlankQuestion } from "./objects";
+import { makeBlankQuestion, duplicateQuestion } from "./objects";
 
 /**
  * Consumes an array of questions and returns a new array with only the questions
@@ -171,7 +171,7 @@ export function addNewQuestion(
 }
 
 /***
- * Consumes an array of Questions and produces a new array of Questions, where all
+ * Consumes an array of Questions and produces a tnew array of Questions, where all
  * the Questions are the same EXCEPT for the one with the given `targetId`. That
  * Question should be the same EXCEPT that its name should now be `newName`.
  */
@@ -184,7 +184,9 @@ export function renameQuestionById(
     const findTarget: number = newQuestions.findIndex(
         (question: Question): boolean => question.id === targetId
     );
-    newQuestions[findTarget].name = newName;
+    const oldQuestion: Question = { ...newQuestions[findTarget] };
+    const newQuestion = { ...oldQuestion, name: newName };
+    newQuestions.splice(findTarget, 1, newQuestion);
     return newQuestions;
 }
 
@@ -200,7 +202,17 @@ export function changeQuestionTypeById(
     targetId: number,
     newQuestionType: QuestionType
 ): Question[] {
-    return [];
+    const newQuestions: Question[] = [...questions];
+    const findTarget: number = newQuestions.findIndex(
+        (question: Question): boolean => question.id === targetId
+    );
+    const oldQuestion: Question = { ...newQuestions[findTarget] };
+    const newQuestion = { ...oldQuestion, type: newQuestionType };
+    if (newQuestionType === "short_answer_question") {
+        newQuestion.options = [];
+    }
+    newQuestions.splice(findTarget, 1, newQuestion);
+    return newQuestions;
 }
 
 /**
@@ -219,7 +231,24 @@ export function editOption(
     targetOptionIndex: number,
     newOption: string
 ): Question[] {
-    return [];
+    const newQuestions: Question[] = [...questions];
+    const findTarget: number = newQuestions.findIndex(
+        (question: Question): boolean => question.id === targetId
+    );
+    const oldQuestion: Question = { ...newQuestions[findTarget] };
+    let newQuestion: Question;
+    if (targetOptionIndex === -1) {
+        newQuestion = {
+            ...oldQuestion,
+            options: [...oldQuestion.options, newOption]
+        };
+    } else {
+        const newOptions = [...oldQuestion.options];
+        newOptions.splice(targetOptionIndex, 1, newOption);
+        newQuestion = { ...oldQuestion, options: newOptions };
+    }
+    newQuestions.splice(findTarget, 1, newQuestion);
+    return newQuestions;
 }
 
 /***
@@ -233,5 +262,12 @@ export function duplicateQuestionInArray(
     targetId: number,
     newId: number
 ): Question[] {
-    return [];
+    const newQuestions: Question[] = [...questions];
+    const findTarget: number = newQuestions.findIndex(
+        (question: Question): boolean => question.id === targetId
+    );
+    const oldQuestion: Question = { ...newQuestions[findTarget] };
+    const newQuestion: Question = duplicateQuestion(newId, oldQuestion);
+    newQuestions.splice(findTarget + 1, 0, newQuestion);
+    return newQuestions;
 }
