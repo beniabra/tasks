@@ -5,7 +5,7 @@ export function RevealAnswer(): JSX.Element {
     const [visible, setVisibile] = useState<boolean>(false);
 
     function flipVisibility(): void {
-        setVisibile(true);
+        setVisibile(!visible);
     }
     return (
         <div>
