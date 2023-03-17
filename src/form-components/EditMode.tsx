@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import { Form, Row } from "react-bootstrap";
 
 export function EditMode(): JSX.Element {
     const [name, setName] = useState<string>("Your Name");
